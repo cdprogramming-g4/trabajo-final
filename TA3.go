@@ -16,6 +16,7 @@ const (
 type Player struct {
 	ID         uint
 	characters []int //Positions
+	missTurn   chan bool
 }
 
 type BoardSquare uint8
@@ -85,6 +86,13 @@ func (p *Player) Play(g *Game) {
 		}
 		fmt.Printf("Turno del jugador %d\n", p.ID+1)
 
+		if <-p.missTurn {
+			g.turnSignal <- 1
+			p.missTurn <- false
+			fmt.Printf("El jugador %d ha perdido su turno\n", p.ID+1)
+			continue
+		}
+
 		// Lanzar dados
 		dice1 := rand.Intn(6) + 1
 		dice2 := rand.Intn(6) + 1
@@ -104,15 +112,19 @@ func (p *Player) Play(g *Game) {
 
 		if newPos < 0 {
 			p.characters[charIndex] = 0
+			p.missTurn <- false
 			fmt.Printf("Personaje %d del jugador %d regresa al inicio\n", charIndex+1, p.ID+1)
 		} else if newPos >= BoardSize {
 			p.characters[charIndex] = BoardSize
+			p.missTurn <- false
 			fmt.Printf("El personaje %d del jugador %d llegó a la meta\n", charIndex+1, p.ID+1)
 		} else if g.board[newPos] != PATH {
 			p.characters[charIndex] = newPos
+			p.missTurn <- true
 			fmt.Printf("El personaje %d del jugador %d cayó en un obstáculo, pierde el turno\n", charIndex+1, p.ID+1)
 		} else {
 			p.characters[charIndex] = newPos
+			p.missTurn <- false
 			fmt.Printf("El jugador %d avanzó/retrocedió el personaje %d a la casilla %d\n", p.ID+1, charIndex+1, p.characters[charIndex])
 		}
 
@@ -144,7 +156,6 @@ func main() {
 		turnSignal: make(chan int, 1),
 	}
 
-	// Creación de los obstáculos en el tablero
 	for i := 0; i < NumObstacles; i++ {
 		min := len(game.board) / NumObstacles * i
 		max := min + NumObstacles
@@ -162,10 +173,12 @@ func main() {
 		players[i] = &Player{
 			ID:         i,
 			characters: make([]int, NumCharacters),
+			missTurn:   make(chan bool, 1),
 		}
+		// Inicializar la pérdida del turno en falso
+		players[i].missTurn <- false
 
 		wg.Add(1)
-		// Goroutinas de los jugadores
 		go func(p *Player) {
 			defer wg.Done()
 			p.Play(game)
