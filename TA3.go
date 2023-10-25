@@ -37,7 +37,6 @@ type Best struct {
 
 func NextMovement(p *Player, g *Game, move int) Best {
 	var wg sync.WaitGroup
-	var mu sync.Mutex
 	n := len(p.characters)
 	bestChann := make(chan Best, n+1)
 	bestChann <- Best{-1, 0}
@@ -51,17 +50,15 @@ func NextMovement(p *Player, g *Game, move int) Best {
 			// Se dirige a un camino libre
 			if newPos > 0 && newPos < BoardSize &&
 				g.board[newPos] == PATH {
-				mu.Lock()
 				best := <-bestChann
 				// Ha avanzado más
 				if newPos > best.position {
-					fmt.Println("\tPersonaje", index+1, "en posición", newPos, "vs mejor jugador", best.index+1, "en posición", best.position)
+					fmt.Println("\tPersonaje", index+1, "en posición", newPos, "es mejor que el jugador", best.index+1)
 					current := Best{index, newPos}
 					bestChann <- current
 				} else {
 					bestChann <- best
 				}
-				mu.Unlock()
 			}
 		}(i, posChar)
 	}
@@ -120,9 +117,9 @@ func main() {
 			ID:         i,
 			characters: make([]int, NumCharacters),
 		}
-		for j := 0; j < NumCharacters; j++ {
-			players[i].characters[j] = rand.Intn(4)
-		}
+		// for j := 0; j < NumCharacters; j++ {
+		// 	players[i].characters[j] = rand.Intn(4)
+		// }
 		players[i].Play(game)
 	}
 
