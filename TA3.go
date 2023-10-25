@@ -39,20 +39,27 @@ func NextMovement(p *Player, g *Game, move int) Best {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	n := len(p.characters)
-	best := Best{-1, 0}
+	bestChann := make(chan Best, n+1)
+	bestChann <- Best{-1, 0}
 
 	for i, posChar := range p.characters {
 		wg.Add(1)
 		go func(index, position int) {
 			defer wg.Done()
 			newPos := position + move
+			fmt.Println("\tPersonaje", index+1, "avanzaría de", position, "a", newPos)
 			// Se dirige a un camino libre
 			if newPos > 0 && newPos < BoardSize &&
 				g.board[newPos] == PATH {
-				// Ha avanzado más
 				mu.Lock()
+				best := <-bestChann
+				// Ha avanzado más
 				if newPos > best.position {
-					best = Best{index, newPos}
+					fmt.Println("\tPersonaje", index+1, "en posición", newPos, "vs mejor jugador", best.index+1, "en posición", best.position)
+					current := Best{index, newPos}
+					bestChann <- current
+				} else {
+					bestChann <- best
 				}
 				mu.Unlock()
 			}
@@ -60,11 +67,14 @@ func NextMovement(p *Player, g *Game, move int) Best {
 	}
 	wg.Wait()
 
+	best := <-bestChann
+	close(bestChann)
 	// Elegir aleatorio si no pudo encontrar uno ideal
 	if best.index == -1 {
 		best.index = rand.Intn(n)                       //charIndex
 		best.position = p.characters[best.index] + move //position
 	}
+	fmt.Println("\tEs mejor mover el personaje", best.index+1)
 	return best
 }
 
@@ -109,6 +119,9 @@ func main() {
 		players[i] = &Player{
 			ID:         i,
 			characters: make([]int, NumCharacters),
+		}
+		for j := 0; j < NumCharacters; j++ {
+			players[i].characters[j] = rand.Intn(4)
 		}
 		players[i].Play(game)
 	}
