@@ -13,43 +13,57 @@ const (
 )
 
 type Player struct {
-	ID         int
+	ID         uint
 	characters []int //Positions
 }
 
+type BoardSquare uint8
+
+const (
+	PATH     BoardSquare = 0
+	WALL     BoardSquare = 1
+	TRAP     BoardSquare = 2
+	CREATURE BoardSquare = 3
+)
+
 type Game struct {
-	board     []int
-	obstacles map[int]bool
+	board []BoardSquare
 }
 
-func NextMovement(p *Player, g *Game, move int) []int {
-	best := make([]int, 2)
-	best[0] = -1
-	best[1] = 0
+type Best struct {
+	index    int
+	position int
+}
+
+func NextMovement(p *Player, g *Game, move int) Best {
 	var wg sync.WaitGroup
+	var mu sync.Mutex
+	n := len(p.characters)
+	best := Best{-1, 0}
 
 	for i, posChar := range p.characters {
 		wg.Add(1)
-		go func(index, position, move int) {
+		go func(index, position int) {
 			defer wg.Done()
 			newPos := position + move
 			// Se dirige a un camino libre
 			if newPos > 0 && newPos < BoardSize &&
-				!g.obstacles[newPos] {
+				g.board[newPos] == PATH {
 				// Ha avanzado más
-				if newPos > best[1] {
-					best[0] = index
-					best[1] = newPos
+				mu.Lock()
+				if newPos > best.position {
+					best = Best{index, newPos}
 				}
+				mu.Unlock()
 			}
-		}(i, posChar, move)
+		}(i, posChar)
 	}
 	wg.Wait()
 
 	// Elegir aleatorio si no pudo encontrar uno ideal
-	if best[0] == -1 {
-		best[0] = rand.Intn(len(p.characters)) //charIndex
-		best[1] = p.characters[best[0]] + move //position
+	if best.index == -1 {
+		best.index = rand.Intn(n)                       //charIndex
+		best.position = p.characters[best.index] + move //position
 	}
 	return best
 }
@@ -70,10 +84,10 @@ func (p *Player) Play(g *Game) {
 		}
 
 		best := NextMovement(p, g, move)
-		charIndex := best[0]
-		newPos := best[1]
+		charIndex := best.index
+		newPos := best.position
 
-		if newPos > 0 && newPos < BoardSize && !g.obstacles[newPos] {
+		if newPos > 0 && newPos < BoardSize && g.board[newPos] == PATH {
 			p.characters[charIndex] = newPos
 			fmt.Printf("El jugador %d avanzó/retrocedió el personaje %d a la casilla %d\n", p.ID+1, charIndex+1, p.characters[charIndex])
 		} else {
@@ -86,12 +100,12 @@ func (p *Player) Play(g *Game) {
 
 func main() {
 	game := &Game{
-		board: make([]int, BoardSize),
+		board: make([]BoardSquare, BoardSize),
 	}
 
 	players := make([]*Player, NumPlayers)
 
-	for i := 0; i < NumPlayers; i++ {
+	for i := uint(0); i < NumPlayers; i++ {
 		players[i] = &Player{
 			ID:         i,
 			characters: make([]int, NumCharacters),
