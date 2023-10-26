@@ -27,11 +27,11 @@ Ludo modificado en lenguaje GO para el curso de programación Concurrente y Dist
 * La creación **obstáculos** se realiza de forma aleatoria en base al número definido para el juego.
   ```
   for i := 0; i < NumObstacles; i++ {
-		min := len(game.board) / NumObstacles * i
-		max := min + NumObstacles
-		obsPos := rand.Intn(max-min) + min
-		game.board[obsPos] = BoardSquare(rand.Intn(3) + 1)
-	}
+    min := len(game.board) / NumObstacles * i
+    max := min + NumObstacles
+    obsPos := rand.Intn(max-min) + min
+    game.board[obsPos] = BoardSquare(rand.Intn(3) + 1)
+  }
   ```
 #### Jugadores
 * Cada **jugador** tiene cuatro personajes.
@@ -69,19 +69,19 @@ En cada turno, los jugadores:
     <br/><br/>![diagrama MissTurn](diagrams/missTurn.png "MissTurn")<br/><br/>
     ```
     if newPos < 0 {
-			...
-			fmt.Printf("Personaje %d del jugador %d regresa al inicio\n", charIndex+1, p.ID+1)
-		} else if newPos >= BoardSize {
-			...
-			fmt.Printf("El personaje %d del jugador %d llegó a la meta\n", charIndex+1, p.ID+1)
-		} else if g.board[newPos] != PATH {
-			// p.characters[charIndex] = newPos
-			p.missTurn <- true
-			fmt.Printf("El personaje %d del jugador %d cayó en un obstáculo, pierde el turno\n", charIndex+1, p.ID+1)
-		} else {
-			...
-			fmt.Printf("El jugador %d avanzó/retrocedió el personaje %d a la casilla %d\n", p.ID+1, charIndex+1, p.characters[charIndex])
-		}
+      ...
+      fmt.Printf("Personaje %d del jugador %d regresa al inicio\n", charIndex+1, p.ID+1)
+    } else if newPos >= BoardSize {
+      ...
+      fmt.Printf("El personaje %d del jugador %d llegó a la meta\n", charIndex+1, p.ID+1)
+    } else if g.board[newPos] != PATH {
+      // p.characters[charIndex] = newPos
+      p.missTurn <- true
+      fmt.Printf("El personaje %d del jugador %d cayó en un obstáculo, pierde el turno\n", charIndex+1, p.ID+1)
+    } else {
+      ...
+      fmt.Printf("El jugador %d avanzó/retrocedió el personaje %d a la casilla %d\n", p.ID+1, charIndex+1, p.characters[charIndex])
+    }
     ```
 
 ### Objetivo
