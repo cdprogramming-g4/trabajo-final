@@ -24,6 +24,15 @@ Ludo modificado en lenguaje GO para el curso de programación Concurrente y Dist
   //...
   board []BoardSquare
   ```
+* La creación **obstáculos** se realiza de forma aleatoria en base al número definido para el juego.
+  ```
+  for i := 0; i < NumObstacles; i++ {
+		min := len(game.board) / NumObstacles * i
+		max := min + NumObstacles
+		obsPos := rand.Intn(max-min) + min
+		game.board[obsPos] = BoardSquare(rand.Intn(3) + 1)
+	}
+  ```
 #### Jugadores
 * Cada **jugador** tiene cuatro personajes.
 * Cada **personaje** comienza en un punto de partida específico.
@@ -57,6 +66,23 @@ En cada turno, los jugadores:
     p.characters[charIndex] = newPos
     ```
   * Si le toca avanzar hacia una casilla con obstáculo, el jugador pierde el turno y continua el siguiente jugador.
+    <br/><br/>![diagrama MissTurn](diagrams/missTurn.png "MissTurn")<br/><br/>
+    ```
+    if newPos < 0 {
+			...
+			fmt.Printf("Personaje %d del jugador %d regresa al inicio\n", charIndex+1, p.ID+1)
+		} else if newPos >= BoardSize {
+			...
+			fmt.Printf("El personaje %d del jugador %d llegó a la meta\n", charIndex+1, p.ID+1)
+		} else if g.board[newPos] != PATH {
+			// p.characters[charIndex] = newPos
+			p.missTurn <- true
+			fmt.Printf("El personaje %d del jugador %d cayó en un obstáculo, pierde el turno\n", charIndex+1, p.ID+1)
+		} else {
+			...
+			fmt.Printf("El jugador %d avanzó/retrocedió el personaje %d a la casilla %d\n", p.ID+1, charIndex+1, p.characters[charIndex])
+		}
+    ```
 
 ### Objetivo
 * Llevar a los cuatro personajes desde los puntos de partida hasta la meta en el menor número de turnos posible.
@@ -108,9 +134,4 @@ En cada turno, los jugadores:
 ## Concurrencia
 ### Modificaciones y Uso de Canales
 * Los jugadores y el tablero están representados como entidades concurrentes separadas que se comunican a través de canales.
-* Cada jugador tiene su propio canal de comunicación con el tablero del juego para enviar movimientos y recibir actualizaciones del estado del juego. 
-### Tareas a Implementar
-* Implementación de Canales:
-  * Cada jugador tiene un canal de comunicación bidireccional con el tablero.
-* Lógica del Movimiento:
-  * Manejar las interacciones con obstáculos.
+* Cada jugador tiene su propio canal de comunicación con el tablero del juego para enviar movimientos y recibir actualizaciones del estado del juego.
