@@ -131,10 +131,10 @@ En cada turno, los jugadores:
   }
   ```
 
-### Enlace al video
-https://youtu.be/lMiz4XhzDZI
-
 ## Concurrencia
 ### Modificaciones y Uso de Canales
 * Los jugadores y el tablero están representados como entidades concurrentes separadas que se comunican a través de canales.
 * Cada jugador tiene su propio canal de comunicación con el tablero del juego para enviar movimientos y recibir actualizaciones del estado del juego.
+
+## Enlace al video
+https://youtu.be/lMiz4XhzDZI
