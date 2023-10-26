@@ -1,6 +1,11 @@
 # TA3 Modified Ludo
 Ludo modificado en lenguaje GO para el curso de programación Concurrente y Distribuída.
 
+## Integrantes
+* Anto Chávez, Carolain
+* Maguiña Bernuy, Richard José
+* Atarama Leon, Diego Sebastian
+
 ## Desarrollo del Juego
 ### Elementos
 #### Tablero
