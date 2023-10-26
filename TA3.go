@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"sync"
 )
@@ -41,11 +42,13 @@ type Best struct {
 
 func NextMovement(p *Player, g *Game, move int) Best {
 	var wg sync.WaitGroup
-	n := len(p.characters)
-	bestChann := make(chan Best, n+1)
-	bestChann <- Best{-1, 0}
+	bestChann := make(chan Best, NumCharacters+1)
+	bestChann <- Best{-1, -12}
 
 	for i, posChar := range p.characters {
+		if posChar == BoardSize {
+			continue
+		}
 		wg.Add(1)
 		go func(index, position int) {
 			defer wg.Done()
@@ -71,8 +74,8 @@ func NextMovement(p *Player, g *Game, move int) Best {
 	close(bestChann)
 	// Elegir aleatorio si no pudo encontrar uno ideal
 	if best.index == -1 {
-		best.index = rand.Intn(n)                       //charIndex
-		best.position = p.characters[best.index] + move //position
+		best.index = rand.Intn(NumCharacters)
+		best.position = p.characters[best.index] + move
 	}
 	fmt.Println("\tEs mejor mover el personaje", best.index+1)
 	return best
@@ -119,7 +122,7 @@ func (p *Player) Play(g *Game) {
 			p.missTurn <- false
 			fmt.Printf("El personaje %d del jugador %d llegó a la meta\n", charIndex+1, p.ID+1)
 		} else if g.board[newPos] != PATH {
-			p.characters[charIndex] = newPos
+			// p.characters[charIndex] = newPos
 			p.missTurn <- true
 			fmt.Printf("El personaje %d del jugador %d cayó en un obstáculo, pierde el turno\n", charIndex+1, p.ID+1)
 		} else {
@@ -150,6 +153,24 @@ func isWinner(positions []int) bool {
 	return true
 }
 
+func PrintBoard(board []BoardSquare, players []*Player) {
+	width := int(math.Sqrt(BoardSize))
+	var occupied BoardSquare = 9
+	for _, p := range players {
+		for _, c := range p.characters {
+			if c < BoardSize {
+				board[c] = occupied
+			}
+		}
+	}
+	for i := 0; i < BoardSize; i++ {
+		fmt.Printf("%d ", board[i])
+		if (i+1)%width == 0 {
+			fmt.Printf("\n")
+		}
+	}
+}
+
 func main() {
 	game := &Game{
 		board:      make([]BoardSquare, BoardSize),
@@ -164,7 +185,7 @@ func main() {
 	}
 	game.turnSignal <- 1
 
-	fmt.Println(game.board)
+	PrintBoard(game.board, []*Player{})
 
 	players := make([]*Player, NumPlayers)
 	var wg sync.WaitGroup
@@ -187,5 +208,5 @@ func main() {
 
 	fmt.Println("INICIO DEL JUEGO")
 	wg.Wait()
-
+	PrintBoard(game.board, players)
 }
