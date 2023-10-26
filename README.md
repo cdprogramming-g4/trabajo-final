@@ -61,6 +61,8 @@ En cada turno, los jugadores:
 ### Objetivo
 * Llevar a los cuatro personajes desde los puntos de partida hasta la meta en el menor número de turnos posible.
  * Para ello usamos la función `NextMovement`, en la cual el jugador "analiza" el personaje ideal a desplazar.
+ * En esta función hacemos uso de canales para obtener la mejor opción de personaje a mover:
+   <br/><br/>![diagrama de NextMovement](diagrams/nextMovement-chooseBest.png "NextMovement")<br/><br/>
    ```
    bestChann := make(chan Best, NumCharacters+1)
    bestChann <- Best{-1, -12}
