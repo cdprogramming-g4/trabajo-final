@@ -136,5 +136,14 @@ En cada turno, los jugadores:
 * Los jugadores y el tablero están representados como entidades concurrentes separadas que se comunican a través de canales.
 * Cada jugador tiene su propio canal de comunicación con el tablero del juego para enviar movimientos y recibir actualizaciones del estado del juego.
 
+## Conclusiones
+* El uso de la concurrencia en un juego que se desarrollo por turnos es una manera eficiente de realizar esta implementación.
+* Los canales permiten realizar una comunicación efectiva de los distintos estados presentes en el juego.
+* El desarrollo de un juego de forma concurrente nos permite mejorar nuestra lógica de programación, pues nos enfrentamos a problemas recurrentes de este paradigma que tenemos que solucionar para obtener un resultado óptimo.
+
 ## Enlace al video
+[![Video Exposición](https://img.youtube.com/vi/lMiz4XhzDZI/0.jpg)](https://www.youtube.com/watch?v=lMiz4XhzDZI)
 https://youtu.be/lMiz4XhzDZI
+
+## Enlace al repositorio
+https://github.com/cdprogramming-g4/ta3-modified-ludo
