@@ -1,4 +1,4 @@
-# TA3 Modified Ludo
+# TA4 Modified Ludo
 Ludo modificado en lenguaje GO para el curso de programación Concurrente y Distribuída.
 
 ## Integrantes
@@ -131,10 +131,13 @@ En cada turno, los jugadores:
   }
   ```
 
-## Concurrencia
+## Concurrencia y Distribución
 ### Modificaciones y Uso de Canales
 * Los jugadores y el tablero están representados como entidades concurrentes separadas que se comunican a través de canales.
 * Cada jugador tiene su propio canal de comunicación con el tablero del juego para enviar movimientos y recibir actualizaciones del estado del juego.
+### Algoritmos distribuídos
+* La simulación debe correr concurrentemente usando algoritmo distribuido.
+* Se manejará un grupo grande de jugadores como host utilizando una comunicación a través de puertos.
 
 ## Conclusiones
 * El uso de la concurrencia en un juego que se desarrollo por turnos es una manera eficiente de realizar esta implementación.
