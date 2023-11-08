@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -21,14 +22,22 @@ func main() {
 
 	br := bufio.NewReader(conn)
 	jStr, _ := br.ReadString('\n')
-	jStr = jStr[:len(jStr)-1]
-	numPlayer, _ := strconv.Atoi(jStr)
+	numPlayer, _ := strconv.Atoi(strings.TrimSpace(jStr))
+
 	msg, _ := br.ReadString('\n')
 	fmt.Printf(msg)
 	fmt.Printf("Soy el jugador %d...\n", numPlayer)
 	fmt.Println("Esperando a que el juego comience...\n")
 
 	// Implementa la lógica para esperar a que el juego comience.
+	startGameSignal := false
+	for startGameSignal != true {
+		jStr, _ = br.ReadString('\n')
+		num, _ := strconv.Atoi(strings.TrimSpace(jStr))
+		if numPlayer == num {
+			startGameSignal = true
+		}
+	}
 
 	fmt.Println("INICIO DEL JUEGO")
 	for {

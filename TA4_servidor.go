@@ -180,7 +180,6 @@ func main() {
 	game := &Game{
 		board:      make([]BoardSquare, BoardSize),
 		turnSignal: make(chan int, 1),
-		players:    make([]*Player, NumPlayers),
 	}
 
 	for i := 0; i < NumObstacles; i++ {
@@ -191,12 +190,8 @@ func main() {
 	}
 	game.turnSignal <- 1
 
-	for i := 0; i < BoardSize; i++ {
-		fmt.Printf("%d ", game.board[i])
-		if (i+1)%int(math.Sqrt(BoardSize)) == 0 {
-			fmt.Printf("\n")
-		}
-	}
+	PrintBoard(game.board, game.players)
+	game.players = make([]*Player, NumPlayers)
 
 	listener, err := net.Listen("tcp", ServerAddress)
 	if err != nil {
@@ -236,6 +231,11 @@ func main() {
 			defer wg.Done()
 			p.Play(game)
 		}(player)
+	}
+
+	// Enviar señal a todos los jugadores de que el juego va a comenzar
+	for i, player := range game.players {
+		fmt.Fprintln(player.conn, strconv.Itoa(i+1))
 	}
 
 	fmt.Println("INICIO DEL JUEGO")
