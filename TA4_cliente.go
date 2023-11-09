@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"net"
 	"strconv"
@@ -12,6 +13,14 @@ const (
 	ServerAddress = "localhost:8080"
 )
 
+type LocalPlayer struct {
+	ID         uint
+	characters []int
+	boardRef   []uint8
+	boardSize  uint
+	conn       net.Conn
+}
+
 func main() {
 	conn, err := net.Dial("tcp", ServerAddress)
 	if err != nil {
@@ -20,27 +29,36 @@ func main() {
 	}
 	defer conn.Close()
 
+	var boardRef []uint8
 	br := bufio.NewReader(conn)
-	jStr, _ := br.ReadString('\n')
-	numPlayer, _ := strconv.Atoi(strings.TrimSpace(jStr))
+	str, _ := br.ReadString('\n')
+	parts := strings.Split(str, " ")
+	numPlayer, _ := strconv.Atoi(parts[0])
+	numCharac, _ := strconv.Atoi(parts[1])
+	json.Unmarshal([]byte(strings.TrimSpace(parts[2])), &boardRef)
+	bSize := len(boardRef)
+
+	localPlayer := &LocalPlayer{
+		ID:         uint(numPlayer),
+		characters: make([]int, numCharac),
+		boardRef:   boardRef,
+		boardSize:  uint(bSize),
+		conn:       conn,
+	}
 
 	msg, _ := br.ReadString('\n')
 	fmt.Printf(msg)
-	fmt.Printf("Soy el jugador %d...\n", numPlayer)
+	fmt.Printf("Soy el jugador %d...\n", localPlayer.ID)
 	fmt.Println("Esperando a que el juego comience...\n")
 
-	// Implementa la lógica para esperar a que el juego comience.
-	startGameSignal := false
-	for startGameSignal != true {
-		jStr, _ = br.ReadString('\n')
-		num, _ := strconv.Atoi(strings.TrimSpace(jStr))
-		if numPlayer == num {
-			startGameSignal = true
-		}
-	}
+	// Esperar a que el servidor mande la señal para que inicie el juego.
+	msg, _ = br.ReadString('\n')
+	fmt.Println(msg)
 
-	fmt.Println("INICIO DEL JUEGO")
 	for {
+		// Esperar a que el servidor le de señal de turno
+		//...
+
 		// Implementa la lógica para hacer movimientos en el juego.
 	}
 }

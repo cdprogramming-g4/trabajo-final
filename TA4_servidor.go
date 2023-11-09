@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"math/rand"
@@ -190,6 +191,10 @@ func main() {
 	}
 	game.turnSignal <- 1
 
+	// Codificar el tablero para pasarlo como referencia a cada jugador
+	boardRefBytes, _ := json.Marshal(game.board)
+	boardRefStr := string(boardRefBytes)
+
 	PrintBoard(game.board, game.players)
 	game.players = make([]*Player, NumPlayers)
 
@@ -217,7 +222,7 @@ func main() {
 		// Inicializar la pérdida del turno en falso
 		game.players[i].missTurn <- false
 
-		fmt.Fprintln(conn, strconv.Itoa(i+1))
+		fmt.Fprintln(conn, strconv.Itoa(i+1)+" "+strconv.Itoa(NumCharacters)+" "+boardRefStr)
 		fmt.Fprintln(conn, "Conectado: Eres el jugador "+strconv.Itoa(i+1))
 	}
 
@@ -231,11 +236,8 @@ func main() {
 			defer wg.Done()
 			p.Play(game)
 		}(player)
-	}
-
-	// Enviar señal a todos los jugadores de que el juego va a comenzar
-	for i, player := range game.players {
-		fmt.Fprintln(player.conn, strconv.Itoa(i+1))
+		// Enviar señal a todos los jugadores de que el juego va a comenzar
+		fmt.Fprintln(player.conn, "INICIO DEL JUEGO")
 	}
 
 	fmt.Println("INICIO DEL JUEGO")
