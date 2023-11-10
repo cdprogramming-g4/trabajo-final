@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -23,6 +24,7 @@ type Player struct {
 	characters []int
 	missTurn   chan bool
 	conn       net.Conn
+	buff       *bufio.Reader
 }
 
 type BoardSquare uint8
@@ -41,52 +43,6 @@ type Game struct {
 	players    []*Player
 }
 
-type Best struct {
-	index    int
-	position int
-}
-
-func NextMovement(p *Player, g *Game, move int) Best {
-	var wg sync.WaitGroup
-	bestChann := make(chan Best, NumCharacters+1)
-	bestChann <- Best{-1, -12}
-
-	for i, posChar := range p.characters {
-		if posChar == BoardSize {
-			continue
-		}
-		wg.Add(1)
-		go func(index, position int) {
-			defer wg.Done()
-			newPos := position + move
-			fmt.Println("\tPersonaje", index+1, "avanzaría de", position, "a", newPos)
-			// Se dirige a un camino libre
-			if newPos > 0 && newPos < BoardSize && g.board[newPos] == PATH {
-				best := <-bestChann
-				// Ha avanzado más
-				if newPos > best.position {
-					fmt.Println("\tPersonaje", index+1, "en posición", newPos, "es mejor que el personaje", best.index+1)
-					current := Best{index, newPos}
-					bestChann <- current
-				} else {
-					bestChann <- best
-				}
-			}
-		}(i, posChar)
-	}
-	wg.Wait()
-
-	best := <-bestChann
-	close(bestChann)
-	// Elegir aleatorio si no pudo encontrar uno ideal
-	if best.index == -1 {
-		best.index = rand.Intn(NumCharacters)
-		best.position = p.characters[best.index] + move
-	}
-	fmt.Println("\tEs mejor mover el personaje", best.index+1)
-	return best
-}
-
 func (p *Player) Play(g *Game) {
 	for true {
 		_, ok := <-g.turnSignal
@@ -102,51 +58,6 @@ func (p *Player) Play(g *Game) {
 			continue
 		}
 
-		// Lanzar dados
-		dice1 := rand.Intn(6) + 1
-		dice2 := rand.Intn(6) + 1
-		var move int = 0
-
-		if operator := rand.Intn(2); operator == 0 {
-			move = dice1 + dice2
-			fmt.Printf("Dado: %d + %d\n", dice1, dice2)
-		} else {
-			move = dice1 - dice2
-			fmt.Printf("Dado: %d - %d\n", dice1, dice2)
-		}
-
-		best := NextMovement(p, g, move)
-		charIndex := best.index
-		newPos := best.position
-
-		if newPos < 0 {
-			p.characters[charIndex] = 0
-			p.missTurn <- false
-			fmt.Printf("Personaje %d del jugador %d regresa al inicio\n", charIndex+1, p.ID+1)
-		} else if newPos >= BoardSize {
-			p.characters[charIndex] = BoardSize
-			p.missTurn <- false
-			fmt.Printf("El personaje %d del jugador %d llegó a la meta\n", charIndex+1, p.ID+1)
-		} else if g.board[newPos] != PATH {
-			// p.characters[charIndex] = newPos
-			p.missTurn <- true
-			fmt.Printf("El personaje %d del jugador %d cayó en un obstáculo, pierde el turno\n", charIndex+1, p.ID+1)
-		} else {
-			p.characters[charIndex] = newPos
-			p.missTurn <- false
-			fmt.Printf("El jugador %d avanzó/retrocedió el personaje %d a la casilla %d\n", p.ID+1, charIndex+1, p.characters[charIndex])
-		}
-
-		if isWinner(p.characters) {
-			fmt.Printf("El jugador %d ganó la partida.\nFIN DEL JUEGO.\n", p.ID+1)
-			g.gameOver = true
-			close(g.turnSignal)
-			return
-		}
-
-		if !g.gameOver {
-			g.turnSignal <- 1
-		}
 	}
 }
 
@@ -213,11 +124,13 @@ func main() {
 			fmt.Printf("Error aceptando la conexión al servidor: %v\n", err)
 			return
 		}
+		buff := bufio.NewReader(conn)
 		game.players[i] = &Player{
-			ID:         uint(i),
+			ID:         uint(i + 1),
 			characters: make([]int, NumCharacters),
 			missTurn:   make(chan bool, 1),
 			conn:       conn,
+			buff:       buff,
 		}
 		// Inicializar la pérdida del turno en falso
 		game.players[i].missTurn <- false
@@ -227,6 +140,7 @@ func main() {
 	}
 
 	fmt.Println("Todos los jugadores se han conectado. Esperando a que comience al juego...")
+	fmt.Println("INICIO DEL JUEGO")
 
 	var wg sync.WaitGroup
 
@@ -236,11 +150,8 @@ func main() {
 			defer wg.Done()
 			p.Play(game)
 		}(player)
-		// Enviar señal a todos los jugadores de que el juego va a comenzar
 		fmt.Fprintln(player.conn, "INICIO DEL JUEGO")
 	}
-
-	fmt.Println("INICIO DEL JUEGO")
 
 	wg.Wait()
 	PrintBoard(game.board, game.players)
