@@ -71,11 +71,47 @@ func NextMovement(p *LocalPlayer, board []uint8, move int) Best {
 }
 
 func (p *LocalPlayer) PlayTurn() {
-	// depends on dices
+	dice1 := rand.Intn(6) + 1
+	dice2 := rand.Intn(6) + 1
 	var move int = 0
+
+	if operator := rand.Intn(2); operator == 0 {
+		move = dice1 + dice2
+		fmt.Printf("Dado: %d + %d\n", dice1, dice2)
+	} else {
+		move = dice1 - dice2
+		fmt.Printf("Dado: %d - %d\n", dice1, dice2)
+	}
+
 	best := NextMovement(p, p.boardRef, move)
 	charIndex := best.index
 	newPos := best.position
+
+	if newPos < 0 {
+		newPos = 0
+		p.characters[charIndex] = 0
+		p.missTurn = false
+		fmt.Printf("Personaje %d del jugador %d regresa al inicio\n", charIndex+1, p.ID)
+	} else if newPos >= int(p.boardSize) {
+		newPos = int(p.boardSize)
+		p.characters[charIndex] = int(p.boardSize)
+		p.missTurn = false
+		fmt.Printf("El personaje %d del jugador %d llegó a la meta\n", charIndex+1, p.ID)
+	} else if p.boardRef[newPos] != 0 {
+		// p.characters[charIndex] = newPos
+		p.missTurn = true
+		fmt.Printf("El personaje %d del jugador %d cayó en un obstáculo, pierde el turno\n", charIndex+1, p.ID)
+	} else {
+		p.characters[charIndex] = newPos
+		p.missTurn = false
+		fmt.Printf("El jugador %d avanzó/retrocedió el personaje %d a la casilla %d\n", p.ID, charIndex+1, p.characters[charIndex])
+	}
+
+	if !p.missTurn {
+		fmt.Fprintln(p.conn, "move "+strconv.Itoa(charIndex)+" "+strconv.Itoa(newPos)+" -")
+	} else {
+		fmt.Fprintln(p.conn, "miss -")
+	}
 
 }
 
@@ -117,8 +153,20 @@ func main() {
 
 	for {
 		// Esperar a que el servidor le de señal de turno
-		//...
-		localPlayer.PlayTurn()
-		// Implementa la lógica para hacer movimientos en el juego.
+		msg, _ = br.ReadString('\n')
+		msg = strings.TrimSpace(msg)
+
+		switch msg {
+		case "play":
+			localPlayer.PlayTurn()
+		case "miss":
+			fmt.Println("Perdí mi turno...")
+		case "win":
+			fmt.Println("GANE!!\nFIN DEL JUEGO")
+			localPlayer.gameOver = true
+		default:
+			fmt.Println(msg + "\nFIN DEL JUEGO")
+			localPlayer.gameOver = true
+		}
 	}
 }

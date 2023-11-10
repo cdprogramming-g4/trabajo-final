@@ -8,7 +8,9 @@ import (
 	"math/rand"
 	"net"
 	"strconv"
+	"strings"
 	"sync"
+	"time"
 )
 
 const (
@@ -39,6 +41,7 @@ const (
 type Game struct {
 	board      []BoardSquare
 	gameOver   bool
+	winner uint
 	turnSignal chan int
 	players    []*Player
 }
@@ -47,17 +50,48 @@ func (p *Player) Play(g *Game) {
 	for true {
 		_, ok := <-g.turnSignal
 		if !ok {
+			fmt.Fprintln(p.conn, "Ganó el jugador "+strconv.Itoa(int(g.winner)))
 			return
 		}
-		fmt.Printf("Turno del jugador %d\n", p.ID+1)
+		fmt.Printf("Turno del jugador %d\n", p.ID)
+		time.Sleep(500 * time.Millisecond)
 
 		if <-p.missTurn {
 			g.turnSignal <- 1
 			p.missTurn <- false
-			fmt.Printf("El jugador %d ha perdido su turno\n", p.ID+1)
+			fmt.Printf("El jugador %d ha perdido su turno\n", p.ID)
+			fmt.Fprintln(p.conn, "miss")
 			continue
 		}
 
+		// Enviar señal de jugada
+		fmt.Fprintln(p.conn, "play")
+
+		// Recibir jugada del jugadador
+		str, _ := p.buff.ReadString('\n')
+		datos := strings.Split(str, " ")
+		switch datos[0] {
+		case "move":
+			idx, _ := strconv.Atoi(datos[1])
+			pos, _ := strconv.Atoi(datos[2])
+			p.characters[idx] = pos
+			p.missTurn <- false
+		case "miss":
+			p.missTurn <- true
+		}
+
+		if isWinner(p.characters) {
+			fmt.Printf("El jugador %d ganó la partida.\nFIN DEL JUEGO.\n", p.ID)
+			g.winner = p.ID
+			g.gameOver = true
+			close(g.turnSignal)
+			fmt.Fprintln(p.conn, "win")
+			return
+		}
+
+		if !g.gameOver {
+			g.turnSignal <- 1
+		}
 	}
 }
 
