@@ -151,7 +151,7 @@ func main() {
 	msg, _ = br.ReadString('\n')
 	fmt.Println(msg)
 
-	for {
+	for !localPlayer.gameOver {
 		// Esperar a que el servidor le de señal de turno
 		msg, _ = br.ReadString('\n')
 		msg = strings.TrimSpace(msg)

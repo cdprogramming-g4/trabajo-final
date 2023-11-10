@@ -131,6 +131,36 @@ En cada turno, los jugadores:
   }
   ```
 
+## Implementación de distribución
+### Creación del servidor y espera de conexiones
+* Se crea un Listener el cual recibirá las conexiones de los clientes.
+  ```
+  listener, err := net.Listen("tcp", ServerAddress)
+  ```
+* Se espera la conexión de los N jugadores, las cuales se conservarán en las instancias de estos para mantener una comunicación durante el juego.
+  ```
+  for i := 0; i < NumPlayers; i++ {
+    conn, err := listener.Accept()
+    ...
+    buff := bufio.NewReader(conn)
+    game.players[i] = &Player{
+      ID:         uint(i + 1),
+      characters: make([]int, NumCharacters),
+      missTurn:   make(chan bool, 1),
+      conn:       conn,
+      buff:       buff,
+    }
+    ...
+  }
+  ```
+* El cliente, por su parte, al realizar la conexión, obtendrá su propio ID, una referencias del tablero, el estado de su turno y del juego mismo.
+* Asimismo, esperará a que el servidor envíe la señal de que el juego ha iniciado
+  ```
+  // Esperar a que el servidor mande la señal para que inicie el juego.
+  msg, _ = br.ReadString('\n')
+  fmt.Println(msg)
+   ```
+
 ## Concurrencia y Distribución
 ### Modificaciones y Uso de Canales
 * Los jugadores y el tablero están representados como entidades concurrentes separadas que se comunican a través de canales.
@@ -143,6 +173,7 @@ En cada turno, los jugadores:
 * El uso de la concurrencia en un juego que se desarrollo por turnos es una manera eficiente de realizar esta implementación.
 * Los canales permiten realizar una comunicación efectiva de los distintos estados presentes en el juego.
 * El desarrollo de un juego de forma concurrente nos permite mejorar nuestra lógica de programación, pues nos enfrentamos a problemas recurrentes de este paradigma que tenemos que solucionar para obtener un resultado óptimo.
+* Para este trabajo, la programación distribuida nos ayuda a simular cómo sería el funcionamiento de este juego a través de una red y que espera nuevas conexiones para iniciar. Ha sido un reto lograr este objetivo.
 
 ## Enlace al video
 [![Video Exposición](https://img.youtube.com/vi/lMiz4XhzDZI/0.jpg)](https://www.youtube.com/watch?v=lMiz4XhzDZI)

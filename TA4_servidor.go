@@ -41,7 +41,7 @@ const (
 type Game struct {
 	board      []BoardSquare
 	gameOver   bool
-	winner uint
+	winner     uint
 	turnSignal chan int
 	players    []*Player
 }
@@ -54,7 +54,6 @@ func (p *Player) Play(g *Game) {
 			return
 		}
 		fmt.Printf("Turno del jugador %d\n", p.ID)
-		time.Sleep(500 * time.Millisecond)
 
 		if <-p.missTurn {
 			g.turnSignal <- 1
@@ -79,6 +78,8 @@ func (p *Player) Play(g *Game) {
 		case "miss":
 			p.missTurn <- true
 		}
+
+		time.Sleep(500 * time.Millisecond)
 
 		if isWinner(p.characters) {
 			fmt.Printf("El jugador %d ganó la partida.\nFIN DEL JUEGO.\n", p.ID)
