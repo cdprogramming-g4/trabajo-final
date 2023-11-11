@@ -161,6 +161,8 @@ En cada turno, los jugadores:
   fmt.Println(msg)
    ```
 
+<br/><br/>![diagrama Nodos](diagrams/missTurn.png "Nodos")<br/><br/>
+
 ## Concurrencia y Distribución
 ### Modificaciones y Uso de Canales
 * Los jugadores y el tablero están representados como entidades concurrentes separadas que se comunican a través de canales.
