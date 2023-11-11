@@ -180,7 +180,7 @@ En cada turno, los jugadores:
 
 ## Enlace al video
 [![Video Exposición](https://img.youtube.com/vi/lMiz4XhzDZI/0.jpg)](https://www.youtube.com/watch?v=lMiz4XhzDZI)
-https://youtu.be/lMiz4XhzDZI
+https://youtu.be/tjOGg7T2aHs
 
 ## Enlace al repositorio
 https://github.com/cdprogramming-g4/ta4-modified-ludo-distributed
