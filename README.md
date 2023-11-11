@@ -179,7 +179,7 @@ En cada turno, los jugadores:
 ![Resultados](results.png "Resultados con 4 jugadores")
 
 ## Enlace al video
-[![Video Exposición](https://img.youtube.com/vi/lMiz4XhzDZI/0.jpg)](https://www.youtube.com/watch?v=lMiz4XhzDZI)
+[![Video Exposición](https://img.youtube.com/vi/lMiz4XhzDZI/0.jpg)](https://youtu.be/tjOGg7T2aHs)
 https://youtu.be/tjOGg7T2aHs
 
 ## Enlace al repositorio
