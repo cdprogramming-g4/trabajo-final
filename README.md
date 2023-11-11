@@ -175,9 +175,12 @@ En cada turno, los jugadores:
 * El desarrollo de un juego de forma concurrente nos permite mejorar nuestra lógica de programación, pues nos enfrentamos a problemas recurrentes de este paradigma que tenemos que solucionar para obtener un resultado óptimo.
 * Para este trabajo, la programación distribuida nos ayuda a simular cómo sería el funcionamiento de este juego a través de una red y que espera nuevas conexiones para iniciar. Ha sido un reto lograr este objetivo.
 
+## Resultado
+![Resultados](results.png "Resultados con 4 jugadores")
+
 ## Enlace al video
 [![Video Exposición](https://img.youtube.com/vi/lMiz4XhzDZI/0.jpg)](https://www.youtube.com/watch?v=lMiz4XhzDZI)
 https://youtu.be/lMiz4XhzDZI
 
 ## Enlace al repositorio
-https://github.com/cdprogramming-g4/ta3-modified-ludo
+https://github.com/cdprogramming-g4/ta4-modified-ludo-distributed
