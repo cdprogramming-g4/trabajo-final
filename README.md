@@ -178,7 +178,7 @@ En cada turno, los jugadores:
 * Para este trabajo, la programación distribuida nos ayuda a simular cómo sería el funcionamiento de este juego a través de una red y que espera nuevas conexiones para iniciar. Ha sido un reto lograr este objetivo.
 
 ## Resultado
-![Resultados](results.png "Resultados con 4 jugadores")
+![Resultados](diagrams/results.png "Resultados con 4 jugadores")
 
 ## Enlace al video
 [![Video Exposición](https://img.youtube.com/vi/lMiz4XhzDZI/0.jpg)](https://youtu.be/tjOGg7T2aHs)
