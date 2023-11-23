@@ -4,24 +4,23 @@ import { stages } from '../App';
 import { getPlayerColor } from './PlayersList';
 
 const Stats = ({setStage}) => {
-    const [players, setPlayers] = useState([
-        {ID: 0, characters:[0, 4, 8, 16]},
-        {ID: 1, characters:[0, 1, 4]},
-        {ID: 2, characters:[0, 2, 6]},
-        {ID: 3, characters:[0, 3, 9]},
-        {ID: 4, characters:[0, 3, 9]},
-        {ID: 5, characters:[0, 3, 9]},
-        {ID: 6, characters:[0, 3, 9]},
-        {ID: 7, characters:[0, 3, 9]},
-        {ID: 8, characters:[0, 3, 9]},
-        {ID: 9, characters:[0, 3, 9]},
-        {ID: 10, characters:[0, 3, 9]},
-        {ID: 11, characters:[0, 3, 9]},
-        {ID: 12, characters:[0, 3, 9]},
-        {ID: 13, characters:[0, 3, 9]},
-        {ID: 14, characters:[0, 3, 9]},
-        {ID: 15, characters:[0, 3, 9]},
-    ]);
+    const [players, setPlayers] = useState([]);
+    // {ID: 0, characters:[0, 4, 8, 16]},
+    // {ID: 1, characters:[0, 1, 4]},
+    // {ID: 2, characters:[0, 2, 6]},
+    // {ID: 3, characters:[0, 3, 9]},
+    // {ID: 4, characters:[0, 3, 9]},
+    // {ID: 5, characters:[0, 3, 9]},
+    // {ID: 6, characters:[0, 3, 9]},
+    // {ID: 7, characters:[0, 3, 9]},
+    // {ID: 8, characters:[0, 3, 9]},
+    // {ID: 9, characters:[0, 3, 9]},
+    // {ID: 10, characters:[0, 3, 9]},
+    // {ID: 11, characters:[0, 3, 9]},
+    // {ID: 12, characters:[0, 3, 9]},
+    // {ID: 13, characters:[0, 3, 9]},
+    // {ID: 14, characters:[0, 3, 9]},
+    // {ID: 15, characters:[0, 3, 9]},
 
     const [rankingPlayers, setRankingPlayers] = useState([]);
 

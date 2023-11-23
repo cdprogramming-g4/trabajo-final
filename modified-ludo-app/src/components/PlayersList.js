@@ -23,7 +23,7 @@ const PlayersList = ({players=[]}) => {
                         </div>
                     </div>
                     <div className='row'>
-                        {p.characters.map(c => <span>{c + 1}</span>)}
+                        {p.characters.map(c => <span key={`c-${c}`}>{c + 1}</span>)}
                     </div>
                 </div>
             )}
