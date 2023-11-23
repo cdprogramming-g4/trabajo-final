@@ -36,7 +36,9 @@ const Square = ({cell=0, x=0, y=0, size={w:0, h:0}}) => {
 };
 
 const Board = ({board=[[]], players=[]}) => {
+  
   const [size, setSize] = useState({w: 0, h:0});
+  
   useEffect(()=>{
     const _size = {
       h: board.length,

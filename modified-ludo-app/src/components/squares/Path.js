@@ -19,6 +19,7 @@ const Path = ({players=[], w=0, x=0, y=0}) => {
         let _numCharsInCell = 0;
 
         players.forEach(p => {
+            // Getting characters IDs
             const charsInCell = p.characters
                         .map((c, i) => isCharInPath(c) ? i : undefined)
                         .filter(i => i !== undefined);
@@ -48,8 +49,8 @@ const Path = ({players=[], w=0, x=0, y=0}) => {
                             margin: `calc(${percCharSize} * -20%)
                                      calc(${percCharSize} * -33%)`,
                         }}
-                        src={`images/characters/char_${p.color}_${c}.png`}
-                        alt={`player ${p.ID} character ${c}`}
+                        src={`images/characters/char_${p.color}_${c+1}.png`}
+                        alt={`player ${p.ID} character ${c+1}`}
                     />
                 )}
             )}

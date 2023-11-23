@@ -3,10 +3,12 @@ import '../css/Credits.css';
 import { stages } from '../App';
 
 const Credits = ({setStage}) => {
+    
     const handleClick = (event)=>{
         event.preventDefault();
         setStage(stages.STATS);
     };
+    
     return (
         <section className='credits col'>
             <h1>Créditos</h1>
