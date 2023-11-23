@@ -8,16 +8,22 @@ const getPlayerColor = (playerID) => colors[playerID % colors.length];;
 const PlayersList = ({players=[]}) => {
     const [playersList, setPlayersList] = useState([]);
     useEffect(() => {
-        setPlayersList( players.map(p => p.ID) );
+        setPlayersList( [...players] );
     }, [players.length > 0]);
 
     return (
         <article className='players-list'>
-            {playersList.map(pID =>
-                <div className='player-info' key={`p-${pID}`}>
-                    <div className={`i-color-${getPlayerColor(pID)}`}></div>
-                    <div className='i-name'>
-                        Player <strong>{pID+1}</strong>
+            <h3>Players</h3>
+            {playersList.map(p =>
+                <div className='player-info' key={`p-${p.ID}`}>
+                    <div className='row'>
+                        <div className={`i-color-${getPlayerColor(p.ID)}`}></div>
+                        <div className='i-name'>
+                            Player <strong>{p.ID + 1}</strong>
+                        </div>
+                    </div>
+                    <div className='row'>
+                        {p.characters.map(c => <span>{c + 1}</span>)}
                     </div>
                 </div>
             )}

@@ -85,15 +85,15 @@ input {
     font-size: 1.25rem;
     font-family: var(--main-font-family);
 }
-button {
-    font-weight: 700;
-    letter-spacing: 0.05rem;
-}
+
 button {
     padding: 1rem 2rem;
     border: none;
     border-radius: 0.25rem;
-    font-size: 1.25rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+    font-family: var(--main-font-family);
+    letter-spacing: 0.05rem;
     background-color: #a0a0d8;
     color: var(--darkest-color);
     box-shadow: #36366380 0px 0.125rem 0.25rem;

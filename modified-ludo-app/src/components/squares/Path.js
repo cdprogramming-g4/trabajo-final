@@ -38,16 +38,17 @@ const Path = ({players=[], w=0, x=0, y=0}) => {
         setPlayersInCell(_playersInCell);
         
     }, [players.length > 0, w > 0, x, y]);
-
+    
     return (
         <div className='board-cell path'>
             {playersInCell.map(p =>
                 {return p.characters.map(c => 
-                    <img className='character' key={`p${p.ID}-char${c}`}
+                    <img key={`p${p.ID}-char${c}`}
+                        className={`character ${p.missTurn?'disabled':''}`}
                         style={{
                             width: `calc(${percCharSize} * 100%)`,
                             margin: `calc(${percCharSize} * -20%)
-                                     calc(${percCharSize} * -33%)`,
+                                     calc(${percCharSize} * -33%)`
                         }}
                         src={`images/characters/char_${p.color}_${c+1}.png`}
                         alt={`player ${p.ID} character ${c+1}`}

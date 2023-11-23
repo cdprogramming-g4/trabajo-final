@@ -16,10 +16,13 @@
     background: transparent; /* make scrollbar transparent */
 }
 
+.players-list h3 {
+    color: #fff;
+    text-shadow: #8fa6f1 0px 1px 1px;
+    margin-bottom: 0.25rem;
+}
+
 .player-info {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
     padding: 0.5rem 1rem;
     background-color: var(--info-bg-color);
     background-image: var(--info-bg-grad);
@@ -31,6 +34,16 @@
     background-color: var(--info-bg-color-hover);
     box-shadow: #4f4f6e80 0px 4px 8px 0px;
     transform: scale(1) rotate(-1deg);
+}
+
+.player-info .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.player-info > .row:last-child {
+    margin-top: 0.25rem;
+    font-size: smaller;
 }
 
 .i-name {

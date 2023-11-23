@@ -58,3 +58,7 @@
     min-width: 12px;
     filter: drop-shadow(#363663 0px 1px 1px);
 }
+.board-cell .character.disabled {
+    filter: saturate(0.5);
+    opacity: 0.75;
+}

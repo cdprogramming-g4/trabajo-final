@@ -61,15 +61,15 @@ const Stats = ({setStage}) => {
             <div className='row highest'>
                 <div className='col'>
                     <h5>3° puesto</h5>
-                    <p className='circle smallest'>{rankingPlayers[2]?.ID}</p>
+                    <p className='circle smallest'>{rankingPlayers[2]?.ID+1}</p>
                 </div>
                 <div className='col'>
                     <h4>Mejor jugador</h4>
-                    <p className='circle big'>{rankingPlayers[0]?.ID}</p>
+                    <p className='circle big'>{rankingPlayers[0]?.ID+1}</p>
                 </div>
                 <div className='col'>
                     <h5>2° puesto</h5>
-                    <p className='circle small'>{rankingPlayers[1]?.ID}</p>
+                    <p className='circle small'>{rankingPlayers[1]?.ID+1}</p>
                 </div>
             </div>
 
@@ -78,15 +78,15 @@ const Stats = ({setStage}) => {
                 <ol>
                     {rankingPlayers.map(p =>
                     <li key={`p-${p.ID}`}>
-                        <strong>{p.ID}</strong>
+                        <strong>{p.ID+1}</strong>
                         <div className='row'>
                             {p.chars.map(c =>
                             <span key={`c-${p.ID}-${c.ID}`} className='row'>
                                 <img
                                     src={`images/characters/char_${getPlayerColor(p.ID)}_${c.ID+1}.png`}
-                                    alt={`player ${p.ID} character ${c.ID+1}`}
+                                    alt={`player ${p.ID+1} character ${c.ID+1}`}
                                 />
-                                {c.pos}
+                                {c.pos + 1}
                             </span>
                             )}
                         </div>
