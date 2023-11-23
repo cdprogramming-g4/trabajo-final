@@ -1,24 +1,46 @@
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap');
 
+:root {
+    --darkest-color: #16161d;
+    --info-bg-color: #dfdff7;
+    --info-bg-color-hover: #fff;
+    --info-bg-grad: linear-gradient(30deg, #8fa6f140, #dfdff7);
+    --main-shadow: #363663 0px 2px 8px 2px;
+    --main-font-family: 'Pixelify Sans', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
 * {
     margin: 0px;
     padding: 0px;
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+    outline: none;
 }
 
 html, body {
     width: 100%;
     height: 100%;
-    font-family: 'Pixelify Sans', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    color: #16161d;
+    font-size: 16px;
+    font-family: var(--main-font-family);
+    color: var(--darkest-color);
     background-color: #a0a0d8;
     background-image: linear-gradient(30deg, #2e3469, #8fa6f1);
+    background-attachment: fixed;
+    cursor: default;
 }
 
-.game {
+.row, .col {
+    display: flex;
+    gap: 2rem;
+}
+.row { flex-direction: row; }
+.col { flex-direction: column; }
+ul li { list-style: square;}
+
+section {
     width: calc(100% - 4rem);
+    min-height: calc(100vh - 4rem);
     padding: 2rem;
     display: flex;
     justify-content: center;
@@ -26,13 +48,64 @@ html, body {
     gap: 2rem;
 }
 
-.game h1 {
+section h1, section h2 {
     width: 100%;
     color: #fff;
-    font-size: 3rem;
     font-weight: 700;
     text-shadow: #8fa6f1 0px 1px 2px,
                  #2e3469 0px 1px 6px;
     text-align: center;
     letter-spacing: 0.05rem;
+}
+section h1 { font-size: 3rem; }
+section h2 { font-size: 2.5rem; }
+section h3 { font-size: 2rem; }
+section h4 { font-size: 1.75rem; }
+section h5 { font-size: 1.5rem; }
+
+/* Card */
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    background-color: var(--info-bg-color);
+    background-image: var(--info-bg-grad);
+    padding: 2rem 2.5rem;
+    border-radius: 0.25rem;
+    box-shadow: var(--main-shadow);
+}
+
+/* Form */
+input {
+    color: var(--darkest-color);
+    flex-grow: 1;
+    border: none;
+    border-radius: 0.25rem;
+    text-align: center;
+    font-size: 1.25rem;
+    font-family: var(--main-font-family);
+}
+button {
+    font-weight: 700;
+    letter-spacing: 0.05rem;
+}
+button {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 0.25rem;
+    font-size: 1.25rem;
+    background-color: #a0a0d8;
+    color: var(--darkest-color);
+    box-shadow: #36366380 0px 0.125rem 0.25rem;
+    transition: 0.2s;
+}
+button:hover, button:active {
+    transform: rotate(-0.5deg);
+}
+button:hover {
+    filter: brightness(1.1);
+}
+button:active {
+    box-shadow: #36366380 0px 0.125rem 0.25rem inset;
+    filter: brightness(0.9);
 }

@@ -1,0 +1,7 @@
+.credits .card {
+    transform: rotate(-1deg);
+    transition: 0.2s;
+}
+.credits .card:hover, .credits .card:active, .credits .card:focus {
+    transform: rotate(-3deg) scale(1.1);
+}

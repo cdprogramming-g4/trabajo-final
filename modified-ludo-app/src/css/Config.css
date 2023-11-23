@@ -1,0 +1,6 @@
+.input {
+    display: flex;
+    gap: 1rem;
+    flex-grow: 1;
+}
+

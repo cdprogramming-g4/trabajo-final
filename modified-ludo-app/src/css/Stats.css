@@ -1,0 +1,58 @@
+p.circle {
+    text-align: center;
+    width: fit-content;
+    height: fit-content;
+    color: var(--darkest-color);
+    border-radius: 5rem;
+    background-color: var(--info-bg-color);
+    background-image: var(--info-bg-grad);
+    box-shadow: var(--main-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+p.big {
+    min-width: 5rem;
+    min-height: 5rem;
+    padding: 1rem 1rem;
+    text-shadow: #8fa6f1 0px 1px 4px,
+                 #2e3469 0px 1px 8px;
+    font-size: 4rem;
+    font-weight: 700;
+}
+p.small {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    padding: 0.5rem 0.5rem;
+    font-size: 2rem;
+}
+p.smallest {
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: 0.25rem 0.25rem;
+    font-size: 1.5rem;
+}
+
+.highest {
+    align-items: stretch;
+}
+.highest .col {
+    align-items: center;
+    justify-content: flex-end;
+    transition: 0.2s;
+}
+.highest .col:hover, .highest .col:active {
+    transform: scale(1.1);
+}
+
+.merit {
+    transition: 0.2s;
+}
+.merit:hover, .merit:active {
+    transform: scale(1.1) rotate(-0.75deg);
+}
+.merit ol li:first-child {
+    font-weight: bold;
+    font-size: 1.1em;
+}
