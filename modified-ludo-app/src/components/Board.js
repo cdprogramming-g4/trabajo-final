@@ -41,8 +41,8 @@ const Board = ({board=[[]], players=[]}) => {
   
   useEffect(()=>{
     const _size = {
-      h: board.length,
-      w: board[0].length,
+      h: board?.length ?? 0,
+      w: board[0]?.length ?? 0,
     };
     setSize(_size);
     console.log(board, _size);

@@ -26,7 +26,7 @@ const Path = ({players=[], w=0, x=0, y=0}) => {
             
             if (charsInCell.length > 0) {
                 _numCharsInCell += charsInCell.length;
-                console.log('player', p, charsInCell, '|', x, y);
+                // console.log('player', p, charsInCell, '|', x, y);
                 _playersInCell.push(
                     {ID: p.ID, missTurn: p.missTurn,
                     characters:charsInCell, color: getPlayerColor(p.ID)}

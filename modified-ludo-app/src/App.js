@@ -16,16 +16,17 @@ const stages = {
 
 function App() {
   const [stage, setStage] = useState(stages.CONFIG);
+  const [gameData, setGameData] = useState(null);
   const [cellJsx, setCellJsx] = useState(<></>);
 
   useEffect(()=>{
     console.log('stage', stage);
     switch(stage) {
       case stages.CONFIG:
-        setCellJsx(<Config setStage={setStage}/>);
+        setCellJsx(<Config setStage={setStage} setGameData={setGameData}/>);
       break;
       case stages.GAME:
-        setCellJsx(<Game setStage={setStage}/>);
+        setCellJsx(<Game setStage={setStage} gameData={gameData}/>);
       break;
       case stages.STATS:
         setCellJsx(<Stats setStage={setStage}/>);
@@ -37,7 +38,7 @@ function App() {
         setCellJsx(<></>);
       break;
     }
-  }, [stage]);
+  }, [gameData, stage]);
 
   return (
     <div className="App">

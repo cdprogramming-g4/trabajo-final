@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../css/Config.css';
 import { stages } from '../App';
 
-const Config = ({setStage}) => {
+const Config = ({setStage, setGameData}) => {
     const [config, setConfig] = useState({
         width: 8,
         height: 8,
@@ -60,6 +60,9 @@ const Config = ({setStage}) => {
         } catch (error) {
           console.error('Error:', error);
         }
+
+        console.log('config', config);
+        setGameData({...config});
     };
 
     const handleSubmit = (event)=>{

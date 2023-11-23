@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PlayersList from './PlayersList';
 import Board from './Board';
 import { stages } from '../App';
 
-const Game = ({setStage}) => {
-
-    const [baseBoard, setBaseBoard] = useState([
-        [1,1,1,0,0,0,1,1],
-        [0,0,0,0,0,0,0,0],
-        [0,0,2,0,0,0,0,0],
-        [0,0,0,3,1,0,0,1],
-        [1,0,0,0,0,0,0,0],
-        [1,0,0,0,0,1,1,1],
-    ]);
+const Game = ({setStage, gameData}) => {
+    
+    const [baseBoard, setBaseBoard] = useState([]);
+    // [
+        // [1,1,1,0,0,0,1,1],
+        // [0,0,0,0,0,0,0,0],
+        // [0,0,2,0,0,0,0,0],
+        // [0,0,0,3,1,0,0,1],
+        // [1,0,0,0,0,0,0,0],
+        // [1,0,0,0,0,1,1,1],
+    // ]
     
     const [players, setPlayers] = useState([
         {ID: 0, characters:[0, 4, 8, 16], missTurn:true,},
@@ -37,6 +38,14 @@ const Game = ({setStage}) => {
         event.preventDefault();
         setStage(stages.STATS);
     };
+
+    useEffect(()=>{
+        if (gameData === undefined || gameData === null) { return; }
+        // .fill(0)
+        const arr = Array(gameData.height??0).fill(Array(gameData.width??0).fill(0));
+        console.log('arr', arr);
+        setBaseBoard([...arr]);
+    }, [gameData]);
 
     return (
         <section className='game'>
