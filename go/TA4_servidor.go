@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math"
 	"math/rand"
 	"net"
+	"net/http"
 	"strconv"
 	"strings"
 	"sync"
@@ -123,7 +125,80 @@ func PrintBoard(board []BoardSquare, players []*Player) {
 	}
 }
 
+type Tag string
+
+const (
+	MSG_CONFIG Tag = "config"
+)
+
+type Config struct {
+	NumPlayers   int `json:"numPlayers"`
+	NumObstacles int `json:"NumObstacles"`
+	Size         int `json:"size"`
+}
+
+//	func ReadMessage(conn net.Conn) {
+//		buff := bufio.NewReader(conn)
+//		jsonMessage, _ := buff.ReadString('\n')
+//		fmt.Println("msg", conn, jsonMessage)
+//		// res, err := http.Get("http://localhost:3000/")
+//		// bodyBytes, err := ioutil.ReadAll(res.Body)
+//		// body := bytes.TrimPrefix(bodyBytes, []byte("\xef\xbb\xbf"))
+//		// var msg Message
+//		// fmt.Println("res---", body, err)
+//		// json.Unmarshal(([]byte(body)), &msg)
+//		// // err = decoder.Decode(&msg)
+//		// fmt.Println("res0", body, err)
+//		// fmt.Println("res", res)
+//		// fmt.Println("msgt", msg.tag)
+//		// fmt.Println("msgmsg", msg.message)
+//		response := "Hola desde el servidor WebSocket\n"
+//		conn.Write([]byte(response))
+//		// switch msg.tag {
+//		// case MSG_CONFIG:
+//		// 	var config Config
+//		// 	json.Unmarshal(([]byte(msg.message)), &config)
+//		// 	fmt.Println("msg", msg.message, config.numPlayers)
+//		// 	fmt.Fprintln(conn, "ok")
+//		// }
+//	}
+func handleConfigRequest(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+
+	// Lee el cuerpo de la solicitud
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error al leer el cuerpo de la solicitud", http.StatusBadRequest)
+		return
+	}
+
+	// Decodifica el cuerpo JSON en la estructura Config
+	var currConfig Config
+	if err := json.Unmarshal(body, &currConfig); err != nil {
+		http.Error(w, "Error al decodificar JSON", http.StatusBadRequest)
+		return
+	}
+
+	// Haz algo con la configuración recibida, por ejemplo, imprímela
+	fmt.Printf("Configuración recibida: %+v\n", currConfig)
+
+	// Puedes enviar una respuesta al cliente si es necesario
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Datos recibidos con éxito"))
+}
+
 func main() {
+
+	http.HandleFunc("/config", handleConfigRequest)
+	http.ListenAndServe(":8080", nil)
+
 	game := &Game{
 		board:      make([]BoardSquare, BoardSize),
 		turnSignal: make(chan int, 1),
@@ -151,6 +226,7 @@ func main() {
 	}
 	defer listener.Close()
 
+	fmt.Println("Servidor escuchando en", listener.Addr())
 	fmt.Println("Esperando a que se conecten todos los jugadores...")
 
 	for i := 0; i < NumPlayers; i++ {
@@ -159,7 +235,10 @@ func main() {
 			fmt.Printf("Error aceptando la conexión al servidor: %v\n", err)
 			return
 		}
+		// ReadMessage(conn)
+
 		buff := bufio.NewReader(conn)
+
 		game.players[i] = &Player{
 			ID:         uint(i + 1),
 			characters: make([]int, NumCharacters),

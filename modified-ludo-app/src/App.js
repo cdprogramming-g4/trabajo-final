@@ -7,10 +7,6 @@ import Stats from './components/Stats';
 import Credits from './components/Credits';
 // import io from 'socket.io-client';
 
-// PATH     : 0,
-// WALL     : 1,
-// TRAP     : 2,
-// CREATURE : 3,
 const stages = {
   CONFIG: 0,
   GAME: 1,

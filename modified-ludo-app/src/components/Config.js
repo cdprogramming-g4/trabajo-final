@@ -23,15 +23,71 @@ const Config = ({setStage}) => {
         setConfig({...config, numObstacles: event.target.value});
     };
 
-    const handleSubmit = (event)=>{
-        event.preventDefault();
-        const message = {
+    const sendDataToServer = async () => {
+        const currConfig = {
             numPlayers: config.numPlayers,
             numObstacles: config.numObstacles,
             size: config.width * config.height,
         };
-        console.log('message:', message);
-        setStage(stages.GAME);
+        console.log('cc', currConfig);
+      
+        try {
+            const serverUrl = 'localhost:8080';
+            await fetch('http://localhost:8080/config', {
+                mode: 'no-cors',
+                method: 'POST',
+                headers: {
+                    // 'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(currConfig)
+            })
+            .then(resp => {
+                // if (!resp.ok) {
+                //     throw `Server error: [${resp.status}] [${resp.statusText}] [${resp.url}]`;
+                // }
+                // return resp.json()
+                setStage(stages.GAME);
+            })
+            .then((data) => {
+                const responseData = data;
+                console.log('Datos recibidos del servidor:', responseData)
+                console.log(data ? JSON.parse(data) : {})
+            })
+            .catch((error) => {
+                console.log('NOT OK', error)
+                // reject(error)
+            });
+
+        } catch (error) {
+          console.error('Error:', error);
+        }
+    };
+
+    const handleSubmit = (event)=>{
+        event.preventDefault();
+        // const message = JSON.stringify({tag: 'config', message: currConfig})+'\n\n';
+        // console.log('config:', currConfig, message);
+        sendDataToServer();
+        // setStage(stages.GAME);
+
+        // const socket = new WebSocket(`ws://${serverUrl}`);
+        // socket.addEventListener('open', (event) => {
+        //     // Abre la conexión WebSocket
+        //     console.log('Conexión abierta', 'enviando mensaje');
+        //     // Envía el mensaje al servidor Go
+        //     socket.send(message);
+            
+        // });
+
+        // // Escucha las respuestas del servidor Go
+        // socket.addEventListener('message', (event) => {
+        //     console.log('Mensaje recibido del servidor:', event.data);
+        //     // setResponse(event.data);
+            
+        //     // Cierra la conexión WebSocket después de recibir la respuesta
+        //     socket.close();
+        // });
     };
 
     return (
