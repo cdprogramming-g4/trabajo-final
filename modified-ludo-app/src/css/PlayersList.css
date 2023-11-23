@@ -1,0 +1,49 @@
+.game {
+    scrollbar-width: none !important;
+    overflow: -moz-scrollbars-none;
+}
+.players-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    max-height: calc(100vh - 4rem);
+    overflow-x: visible;
+    overflow-y: auto;
+    border-radius: 4px;
+}
+.players-list::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
+}
+
+.player-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #dfdff7;
+    background-image: linear-gradient(30deg, #8fa6f140, transparent);
+    box-shadow: #16161d80 0px 3px 2px 2px;
+    border-radius: 4px;
+    transition: 0.2s;
+    cursor: default;
+}
+.player-info:hover, .player-info:active, .player-info:focus {
+    background-color: #fff;
+    box-shadow: #4f4f6e80 0px 4px 8px 0px;
+    transform: scale(1);
+}
+
+.i-name {
+    flex-grow: 1;
+    align-items: center;
+}
+[class^='i-color-'] {
+    width: 1rem;
+    height: 1rem;
+    min-width: 1rem;
+    min-height: 1rem;
+    align-self: center;
+}
+.i-color-red { background-color: #c92b25;}
+.i-color-violet { background-color: #6125c9;}

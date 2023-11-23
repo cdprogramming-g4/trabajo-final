@@ -170,6 +170,9 @@ En cada turno, los jugadores:
 ### Algoritmos distribuídos
 * La simulación debe correr concurrentemente usando algoritmo distribuido.
 * Se manejará un grupo grande de jugadores como host utilizando una comunicación a través de puertos.
+### 
+* Se utilizó la librería socket.io para la transferencia de datos hacia la web `npm install socket.io-client`
+
 
 ## Conclusiones
 * El uso de la concurrencia en un juego que se desarrollo por turnos es una manera eficiente de realizar esta implementación.
