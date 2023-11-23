@@ -47,7 +47,6 @@ const Config = ({setStage}) => {
                 //     throw `Server error: [${resp.status}] [${resp.statusText}] [${resp.url}]`;
                 // }
                 // return resp.json()
-                setStage(stages.GAME);
             })
             .then((data) => {
                 const responseData = data;
@@ -55,8 +54,7 @@ const Config = ({setStage}) => {
                 console.log(data ? JSON.parse(data) : {})
             })
             .catch((error) => {
-                console.log('NOT OK', error)
-                // reject(error)
+                console.log('Error', error)
             });
 
         } catch (error) {
@@ -66,28 +64,9 @@ const Config = ({setStage}) => {
 
     const handleSubmit = (event)=>{
         event.preventDefault();
-        // const message = JSON.stringify({tag: 'config', message: currConfig})+'\n\n';
-        // console.log('config:', currConfig, message);
-        sendDataToServer();
-        // setStage(stages.GAME);
-
-        // const socket = new WebSocket(`ws://${serverUrl}`);
-        // socket.addEventListener('open', (event) => {
-        //     // Abre la conexión WebSocket
-        //     console.log('Conexión abierta', 'enviando mensaje');
-        //     // Envía el mensaje al servidor Go
-        //     socket.send(message);
-            
-        // });
-
-        // // Escucha las respuestas del servidor Go
-        // socket.addEventListener('message', (event) => {
-        //     console.log('Mensaje recibido del servidor:', event.data);
-        //     // setResponse(event.data);
-            
-        //     // Cierra la conexión WebSocket después de recibir la respuesta
-        //     socket.close();
-        // });
+        if (sendDataToServer()){
+            setStage(stages.GAME);
+        }
     };
 
     return (

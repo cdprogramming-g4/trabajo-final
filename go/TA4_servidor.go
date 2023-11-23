@@ -16,12 +16,13 @@ import (
 )
 
 const (
-	BoardSize     = 64
-	NumPlayers    = 4
 	NumCharacters = 4
-	NumObstacles  = 10
 	ServerAddress = "localhost:8080"
 )
+
+var NumObstacles int = 1
+var NumPlayers int = 2
+var BoardSize int = 9
 
 type Player struct {
 	ID         uint
@@ -108,7 +109,7 @@ func isWinner(positions []int) bool {
 }
 
 func PrintBoard(board []BoardSquare, players []*Player) {
-	width := int(math.Sqrt(BoardSize))
+	width := int(math.Sqrt(float64(BoardSize)))
 	var occupied BoardSquare = 9
 	for _, p := range players {
 		for _, c := range p.characters {
@@ -133,36 +134,11 @@ const (
 
 type Config struct {
 	NumPlayers   int `json:"numPlayers"`
-	NumObstacles int `json:"NumObstacles"`
+	NumObstacles int `json:"numObstacles"`
 	Size         int `json:"size"`
 }
 
-//	func ReadMessage(conn net.Conn) {
-//		buff := bufio.NewReader(conn)
-//		jsonMessage, _ := buff.ReadString('\n')
-//		fmt.Println("msg", conn, jsonMessage)
-//		// res, err := http.Get("http://localhost:3000/")
-//		// bodyBytes, err := ioutil.ReadAll(res.Body)
-//		// body := bytes.TrimPrefix(bodyBytes, []byte("\xef\xbb\xbf"))
-//		// var msg Message
-//		// fmt.Println("res---", body, err)
-//		// json.Unmarshal(([]byte(body)), &msg)
-//		// // err = decoder.Decode(&msg)
-//		// fmt.Println("res0", body, err)
-//		// fmt.Println("res", res)
-//		// fmt.Println("msgt", msg.tag)
-//		// fmt.Println("msgmsg", msg.message)
-//		response := "Hola desde el servidor WebSocket\n"
-//		conn.Write([]byte(response))
-//		// switch msg.tag {
-//		// case MSG_CONFIG:
-//		// 	var config Config
-//		// 	json.Unmarshal(([]byte(msg.message)), &config)
-//		// 	fmt.Println("msg", msg.message, config.numPlayers)
-//		// 	fmt.Fprintln(conn, "ok")
-//		// }
-//	}
-func handleConfigRequest(w http.ResponseWriter, r *http.Request) {
+func handleConfigRequest(w http.ResponseWriter, r *http.Request, done chan<- struct{}) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
 		return
@@ -184,20 +160,37 @@ func handleConfigRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Haz algo con la configuración recibida, por ejemplo, imprímela
-	fmt.Printf("Configuración recibida: %+v\n", currConfig)
+	NumObstacles = currConfig.NumObstacles
+	NumObstacles = currConfig.NumObstacles
+	BoardSize = currConfig.Size
 
-	// Puedes enviar una respuesta al cliente si es necesario
+	// Enviar respuesta al cliente
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Datos recibidos con éxito"))
+	response := map[string]string{"message": "Solicitud procesada con éxito"}
+	json.NewEncoder(w).Encode(response)
+
+	// Señalizar que la solicitud ha sido procesada
+	done <- struct{}{}
 }
 
 func main() {
-
-	http.HandleFunc("/config", handleConfigRequest)
-	http.ListenAndServe(":8080", nil)
+	done := make(chan struct{})
+	// CONFIGURACION
+	// fmt.Printf("Solicitando configuración")
+	http.HandleFunc("/config", func(w http.ResponseWriter, r *http.Request) {
+		handleConfigRequest(w, r, done)
+	})
+	// Iniciar el servidor en una goroutine
+	go func() {
+		// if err :=  err != nil {
+		// 	panic(err)
+		// }
+		http.ListenAndServe(":8080", nil)
+	}()
+	fmt.Println("Configuración realizada", NumPlayers, NumObstacles, BoardSize)
 
 	game := &Game{
 		board:      make([]BoardSquare, BoardSize),
