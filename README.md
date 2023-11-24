@@ -1,4 +1,4 @@
-# TA4 Modified Ludo
+# TF Modified Ludo
 Ludo modificado en lenguaje GO para el curso de programación Concurrente y Distribuída.
 
 ## Integrantes
@@ -188,4 +188,4 @@ En cada turno, los jugadores:
 https://youtu.be/tjOGg7T2aHs
 
 ## Enlace al repositorio
-https://github.com/cdprogramming-g4/ta4-modified-ludo-distributed
+https://github.com/cdprogramming-g4/trabajo-final
