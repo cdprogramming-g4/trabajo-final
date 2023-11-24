@@ -189,15 +189,10 @@ func SendConnMessage(message []byte, conn *websocket.Conn, messageType int) {
 	}
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	// Upgrade HTTP request to WebSocket
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		fmt.Println("Servidor escuchando en", err)
-		return
-	}
+func handler(conn *websocket.Conn) {
 	defer conn.Close()
 
+	// cfor:
 	for {
 		// Leer mensaje desde el cliente
 		messageType, data, err := conn.ReadMessage()
@@ -215,6 +210,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err)
 			return
 		}
+
 		switch common.Type {
 		case MSG_CONFIG:
 			ReadConfig(data)
@@ -233,7 +229,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			SendConnMessage(gBoard, conn, messageType)
-			break
+			StartGame()
 		default:
 			fmt.Println("Tag no identificado")
 		}
@@ -241,13 +237,24 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		responseMessage := []byte("Mensaje recibido con éxito")
 		SendConnMessage(responseMessage, conn, messageType)
 	}
+
+	fmt.Println("Handle end")
 }
 
 func main() {
-	http.HandleFunc("/ws", handler)
-	fmt.Printf("Servidor escuchando en %s", ServerAddress)
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		go handler(conn)
+	})
+	fmt.Printf("Servidor escuchando en %s\n", ServerAddress)
 	http.ListenAndServe(":8080", nil)
+}
 
+func StartGame() {
 	game := &Game{
 		board:      Board,
 		turnSignal: make(chan int, 1),
