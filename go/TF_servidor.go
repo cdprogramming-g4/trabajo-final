@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"math/rand"
 	"net"
@@ -13,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 const (
@@ -23,6 +24,7 @@ const (
 var NumObstacles int = 1
 var NumPlayers int = 2
 var BoardSize int = 9
+var Board []BoardSquare
 
 type Player struct {
 	ID         uint
@@ -132,31 +134,33 @@ const (
 	MSG_CONFIG Tag = "config"
 )
 
+type MessageRes struct {
+	Type Tag `json:"type"`
+}
+
 type Config struct {
 	NumPlayers   int `json:"numPlayers"`
 	NumObstacles int `json:"numObstacles"`
 	Size         int `json:"size"`
 }
+type ArrayData struct {
+	Type  string      `json:"type"`
+	Array interface{} `json:"array"`
+}
 
-func handleConfigRequest(w http.ResponseWriter, r *http.Request, done chan<- struct{}) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
-		return
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true // Permitir todas las solicitudes de origen
+	},
+}
 
-	// Lee el cuerpo de la solicitud
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Error al leer el cuerpo de la solicitud", http.StatusBadRequest)
-		return
-	}
-
+func ReadConfig(data []byte) {
 	// Decodifica el cuerpo JSON en la estructura Config
 	var currConfig Config
-	if err := json.Unmarshal(body, &currConfig); err != nil {
-		http.Error(w, "Error al decodificar JSON", http.StatusBadRequest)
+	if err := json.Unmarshal(data, &currConfig); err != nil {
+		fmt.Println("Error al decodificar JSON", err)
 		return
 	}
 
@@ -164,44 +168,89 @@ func handleConfigRequest(w http.ResponseWriter, r *http.Request, done chan<- str
 	NumObstacles = currConfig.NumObstacles
 	BoardSize = currConfig.Size
 
-	// Enviar respuesta al cliente
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Datos recibidos con éxito"))
-	response := map[string]string{"message": "Solicitud procesada con éxito"}
-	json.NewEncoder(w).Encode(response)
+	fmt.Println("Configuración realizada", NumPlayers, NumObstacles, BoardSize)
+}
+func CreateBoard() {
+	Board = make([]BoardSquare, BoardSize)
+	for i := 0; i < NumObstacles; i++ {
+		min := BoardSize / NumObstacles * i
+		max := min + NumObstacles
+		obsPos := rand.Intn(max-min) + min
+		Board[obsPos] = BoardSquare(rand.Intn(3) + 1)
+	}
+}
 
-	// Señalizar que la solicitud ha sido procesada
-	done <- struct{}{}
+func SendConnMessage(message []byte, conn *websocket.Conn, messageType int) {
+	// Enviar una respuesta al cliente (opcional)
+	err := conn.WriteMessage(messageType, message)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	// Upgrade HTTP request to WebSocket
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Println("Servidor escuchando en", err)
+		return
+	}
+	defer conn.Close()
+
+	for {
+		// Leer mensaje desde el cliente
+		messageType, data, err := conn.ReadMessage()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		// Imprimir el mensaje recibido
+		fmt.Printf("\nMensaje recibido: %s\n", data)
+
+		// Parsear el mensaje
+		var common MessageRes
+		if err := json.Unmarshal(data, &common); err != nil {
+			fmt.Println(err)
+			return
+		}
+		switch common.Type {
+		case MSG_CONFIG:
+			ReadConfig(data)
+			CreateBoard()
+			var sliceInt []int
+			for _, v := range Board {
+				sliceInt = append(sliceInt, int(v))
+			}
+			msg := ArrayData{
+				Type:  "Board",
+				Array: sliceInt,
+			}
+			gBoard, err := json.Marshal(msg)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			SendConnMessage(gBoard, conn, messageType)
+			break
+		default:
+			fmt.Println("Tag no identificado")
+		}
+
+		responseMessage := []byte("Mensaje recibido con éxito")
+		SendConnMessage(responseMessage, conn, messageType)
+	}
 }
 
 func main() {
-	done := make(chan struct{})
-	// CONFIGURACION
-	// fmt.Printf("Solicitando configuración")
-	http.HandleFunc("/config", func(w http.ResponseWriter, r *http.Request) {
-		handleConfigRequest(w, r, done)
-	})
-	// Iniciar el servidor en una goroutine
-	go func() {
-		// if err :=  err != nil {
-		// 	panic(err)
-		// }
-		http.ListenAndServe(":8080", nil)
-	}()
-	fmt.Println("Configuración realizada", NumPlayers, NumObstacles, BoardSize)
+	http.HandleFunc("/ws", handler)
+	fmt.Printf("Servidor escuchando en %s", ServerAddress)
+	http.ListenAndServe(":8080", nil)
 
 	game := &Game{
-		board:      make([]BoardSquare, BoardSize),
+		board:      Board,
 		turnSignal: make(chan int, 1),
-	}
-
-	for i := 0; i < NumObstacles; i++ {
-		min := len(game.board) / NumObstacles * i
-		max := min + NumObstacles
-		obsPos := rand.Intn(max-min) + min
-		game.board[obsPos] = BoardSquare(rand.Intn(3) + 1)
 	}
 	game.turnSignal <- 1
 
