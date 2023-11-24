@@ -13,6 +13,10 @@ const stages = {
   STATS: 2,
   CREDITS: 3,
 };
+const connData = {
+  serverURL: 'localhost:8080',
+  port: ':8080',
+};
 
 function App() {
   const [stage, setStage] = useState(stages.CONFIG);
@@ -52,4 +56,4 @@ function App() {
 }
 
 export default App;
-export {stages};
+export {stages, connData};

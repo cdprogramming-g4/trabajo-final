@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../css/Config.css';
-import { stages } from '../App';
+import { connData, stages } from '../App';
 
 const Config = ({setStage, setGameData}) => {
     const [config, setConfig] = useState({
@@ -25,51 +25,41 @@ const Config = ({setStage, setGameData}) => {
 
     const sendDataToServer = async () => {
         const currConfig = {
+            type: 'config',
             numPlayers: config.numPlayers,
             numObstacles: config.numObstacles,
             size: config.width * config.height,
         };
         console.log('cc', currConfig);
-      
-        try {
-            const serverUrl = 'localhost:8080';
-            await fetch('http://localhost:8080/config', {
-                mode: 'no-cors',
-                method: 'POST',
-                headers: {
-                    // 'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(currConfig)
-            })
-            .then(resp => {
-                // if (!resp.ok) {
-                //     throw `Server error: [${resp.status}] [${resp.statusText}] [${resp.url}]`;
-                // }
-                // return resp.json()
-            })
-            .then((data) => {
-                const responseData = data;
-                console.log('Datos recibidos del servidor:', responseData)
-                console.log(data ? JSON.parse(data) : {})
-            })
-            .catch((error) => {
-                console.log('Error', error)
-            });
+        
+        const socket = new WebSocket(`ws://${connData.serverURL}/ws`);
 
-        } catch (error) {
-          console.error('Error:', error);
-        }
+        socket.onopen = () => {
+            console.log('Conexión establecida');
+            socket.send(JSON.stringify(currConfig));
+        };
 
-        console.log('config', config);
-        setGameData({...config});
+        socket.onmessage = (event) => {
+            // Manejar mensajes recibidos del servidor
+            const data = JSON.parse(event.data);
+            console.log('Mensaje del servidor:', data);
+            if (data.type === 'Board') {
+                config.board = data.array;
+                console.log('config', config);
+                setGameData({...config});
+                setStage(stages.GAME);
+            }
+            socket.close();
+        };
+
+        socket.onclose = () => {
+            console.log('Conexión cerrada');
+        };
     };
 
     const handleSubmit = (event)=>{
         event.preventDefault();
-        if (sendDataToServer()){
-            setStage(stages.GAME);
-        }
+        sendDataToServer();
     };
 
     return (

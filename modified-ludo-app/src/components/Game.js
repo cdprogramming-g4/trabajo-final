@@ -6,9 +6,8 @@ import { stages } from '../App';
 const Game = ({setStage, gameData}) => {
     // board es la matriz final
     const [board, setBoard] = useState([]);
-    // baseBoard es lo que se lee desde servidor (para reconocer obstaculos)
+    // gameData.Board es lo que se lee desde servidor (para reconocer obstaculos)
     // opcional: esa configuración también podría ser enviada desde react.
-    const [baseBoard, setBaseBoard] = useState([]);
     //     [
     //     1,1,1,0,0,0,1,1,
     //     0,0,0,0,0,0,0,0,
@@ -52,8 +51,8 @@ const Game = ({setStage, gameData}) => {
     useEffect(()=>{
         // width and height already known
         if (gameData) {
-            if (baseBoard.length > 0) {
-                const arr = TwoDimensional(baseBoard, gameData.width);
+            if (gameData.board) {
+                const arr = TwoDimensional(gameData.board, gameData.width);
                 console.log('Size by game data', arr);
                 setBoard([...arr]);
             }
@@ -63,13 +62,7 @@ const Game = ({setStage, gameData}) => {
                 setBoard([...arr]);
             }
         }
-        else if (baseBoard?.length > 0) {
-            const width = parseInt(Math.sqrt(baseBoard.length))
-            const arr = TwoDimensional(baseBoard, width);
-            console.log('Size by sqrt', arr);
-            setBoard([...arr]);
-        }
-    }, [gameData, baseBoard.length]);
+    }, [gameData]);
     
     useEffect(()=>{
         //TODO
